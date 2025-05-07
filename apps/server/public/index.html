@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sitemap Link Extractor</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: #333;
+    }
+
+    .container {
+      margin-bottom: 40px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input[type="url"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    pre {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+
+    .result {
+      margin-top: 20px;
+    }
+
+    .loading {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Sitemap Link Extractor</h1>
+
+  <div class="container">
+    <h2>Find Sitemaps</h2>
+    <div class="form-group">
+      <label for="website-url">Website URL:</label>
+      <input type="url" id="website-url" placeholder="https://example.com" required>
+    </div>
+    <button id="find-sitemaps-btn">Find Sitemaps</button>
+    <div class="loading" id="find-sitemaps-loading">Loading...</div>
+    <div class="error" id="find-sitemaps-error"></div>
+    <div class="result">
+      <pre id="find-sitemaps-result"></pre>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Extract Links from Sitemap</h2>
+    <div class="form-group">
+      <label for="sitemap-url">Sitemap URL:</label>
+      <input type="url" id="sitemap-url" placeholder="https://example.com/sitemap.xml" required>
+    </div>
+    <button id="extract-sitemap-btn">Extract Links</button>
+    <div class="loading" id="extract-sitemap-loading">Loading...</div>
+    <div class="error" id="extract-sitemap-error"></div>
+    <div class="result">
+      <pre id="extract-sitemap-result"></pre>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Extract All Links from Website</h2>
+    <div class="form-group">
+      <label for="all-links-url">Website URL:</label>
+      <input type="url" id="all-links-url" placeholder="https://example.com" required>
+    </div>
+    <button id="extract-all-links-btn">Extract All Links</button>
+    <div class="loading" id="extract-all-links-loading">Loading...</div>
+    <div class="error" id="extract-all-links-error"></div>
+    <div class="result">
+      <pre id="extract-all-links-result"></pre>
+    </div>
+  </div>
+
+  <script>
+   // Helper function to make API calls
+    async function callApi(endpoint, url) {
+      const apiUrl = `${endpoint}?url=${encodeURIComponent(url)}`;
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      return data;
+    }
+
+    // Find sitemaps
+    document.getElementById('find-sitemaps-btn').addEventListener('click', async () => {
+      const websiteUrl = document.getElementById('website-url').value;
+      if (!websiteUrl) {
+        document.getElementById('find-sitemaps-error').textContent = 'Please enter a website URL';
+        return;
+      }
+
+      document.getElementById('find-sitemaps-error').textContent = '';
+      document.getElementById('find-sitemaps-loading').style.display = 'block';
+      document.getElementById('find-sitemaps-result').textContent = '';
+
+      try {
+        const data = await callApi('find-sitemaps', websiteUrl);
+        document.getElementById('find-sitemaps-result').textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        document.getElementById('find-sitemaps-error').textContent = `Error: ${error.message}`;
+      } finally {
+        document.getElementById('find-sitemaps-loading').style.display = 'none';
+      }
+    });
+
+    // Extract links from sitemap
+    document.getElementById('extract-sitemap-btn').addEventListener('click', async () => {
+      const sitemapUrl = document.getElementById('sitemap-url').value;
+      if (!sitemapUrl) {
+        document.getElementById('extract-sitemap-error').textContent = 'Please enter a sitemap URL';
+        return;
+      }
+
+      document.getElementById('extract-sitemap-error').textContent = '';
+      document.getElementById('extract-sitemap-loading').style.display = 'block';
+      document.getElementById('extract-sitemap-result').textContent = '';
+
+      try {
+        const data = await callApi('sitemap-links', sitemapUrl);
+        document.getElementById('extract-sitemap-result').textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        document.getElementById('extract-sitemap-error').textContent = `Error: ${error.message}`;
+      } finally {
+        document.getElementById('extract-sitemap-loading').style.display = 'none';
+      }
+    });
+
+    // Extract all links from website
+    document.getElementById('extract-all-links-btn').addEventListener('click', async () => {
+      const websiteUrl = document.getElementById('all-links-url').value;
+      if (!websiteUrl) {
+        document.getElementById('extract-all-links-error').textContent = 'Please enter a website URL';
+        return;
+      }
+
+      document.getElementById('extract-all-links-error').textContent = '';
+      document.getElementById('extract-all-links-loading').style.display = 'block';
+      document.getElementById('extract-all-links-result').textContent = '';
+
+      try {
+        const data = await callApi('website-links', websiteUrl);
+        document.getElementById('extract-all-links-result').textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        document.getElementById('extract-all-links-error').textContent = `Error: ${error.message}`;
+      } finally {
+        document.getElementById('extract-all-links-loading').style.display = 'none';
+      }
+    });
+  </script>
+</body>
+
+</html>
