@@ -4,7 +4,7 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { setupStaticFiles } from "./middleware/static";
-import { ApiError, isError } from "./lib/errors";
+import { ApiError, isError } from "./libs/errors";
 import { linkExtractorService } from "./services/link-extractor.service";
 
 const app = new Hono();
